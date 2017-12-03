@@ -2,27 +2,21 @@
 var API = "https://api.github.com/users/";
 
 // Je selectionne l'objet dans le DOM dont l'id est champDeRecherche
-var $champDeRecherche = $('#champDeRecherche');
-
-// J'écoute l'evenement input sur mon objet jQuery
-$champDeRecherche.on('input', function () {
-
-    // Le this point vers le DOM de l'objet jQuery selectionné
-    var user = document.getElementById('champDeRecherche').value;
-
-    if (user) { // Je vérifie si l'utilisateur n'est pas falsy
-
-        // J'execute la requete AJAX.
-        jQuery.ajax({
-            url: API + user + "/repos"
-        }).done(function (response) {
-            $("#tableContainer").html( (getTable(response)));
-        }).catch(function (rejection) {
-            var message = "erreur" || rejection.responseJSON.message;
-            toastr.error(message);
-        });
+function getRepos(username) {
+    // Ici, la requête sera émise de façon synchrone.
+    const req = new XMLHttpRequest();
+    req.open('GET', API + username + "/repos", false);
+    req.send(null);
+    if (req.status === 200) {
+        var monTableau = getTable(JSON.parse(req.response));
+        document.getElementById('tableContainer').innerHTML = monTableau;
+    } else {
+        console.log(JSON.parse(req.response).message);
+        document.getElementById('tableContainer').innerHTML = "Aucun Repository n'a été récupéré";
     }
-});
+}
+
+
 
 /**
  * Transforme un tableau contenant les repositories github en un tableau html
